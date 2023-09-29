@@ -47,15 +47,15 @@ public class Main {
     public void run(){
         Scanner scanner = new Scanner(System.in);
         String value = null;
-        value = scanner.nextLine();
         StringChecker stringChecker = new StringChecker();
+        System.out.printf("Введите Фамилию Имя Отчество, пол(f/m), дату рождения (dd.mm.yyyy), телефон из %d цифр через пробел: \n", stringChecker.getPhoneNumberLength());
+        value = scanner.nextLine();
         try {
             stringChecker.checkString(value);
         } catch (StringLengthException e) {
             System.out.println(e.getMessage());;
         }
         User user = stringChecker.chekingUser();
-
         StringBuilder stringBuilder = new StringBuilder();
         if (user != null){
             stringBuilder.append("<" + user.getSurname() +">");
@@ -64,8 +64,8 @@ public class Main {
             stringBuilder.append("<" + user.getDateOfBirth() +">");
             stringBuilder.append("<" + user.getPhoneNumber() +">");
             stringBuilder.append("<" + user.getSex() +">");
-
-            FileReaderWriter fileReaderWriter = new FileReaderWriter(user.getSurname(), stringBuilder);
+            FileReaderWriter fileReaderWriter = new FileReaderWriter();
+            fileReaderWriter.writeFile(user.getSurname(), stringBuilder);
         }
     }
 }

@@ -1,12 +1,11 @@
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class StringChecker {
     final static int stringLength = 6; // количество данных
     final static String DATE_FORMAT = "dd.MM.yyyy"; // формат даты
-    final static int phoneNumberLength = 11; // количесто символов в номере телефона
+    private int phoneNumberLength = 11; // количесто символов в номере телефона
     private String name;
     private String surname;
     private String patronymic;
@@ -34,25 +33,38 @@ public class StringChecker {
                 System.out.println("The date of birth found");
                 dateOfBirth = str[i];
                 flagDateChecker = true;
-            } else if (!flagSexChecker && str[i].length() == 1) {
-                char sexTemp = stringToChar(str[i]);
-                if (sexTemp == 'f' || sexTemp == 'm') {
-                    flagSexChecker = true;
-                    sex = sexTemp;
-                    System.out.println("The sex found");
-                }
-            } else if (!flagPhoneNumberChecker && isNumber(str[i]) && str[i].length() == phoneNumberLength) {
+            } else if (!flagSexChecker && isSex(str[i])) {
+                sex = stringToChar(str[i]);
+                flagSexChecker = true;
+                System.out.println("The sex found");
+
+            } else if (!flagPhoneNumberChecker && isPhoneNumber(str[i]) && str[i].length() == phoneNumberLength) {
                 {
                     phoneNumber = stringToNumber(str[i]);
                     flagPhoneNumberChecker = true;
-                    System.out.println("The number found");
+                    System.out.println("The phone number found");
                 }
-            } else if (!flagNameChecker &&(isName(str[i]) && isName(str[i+1]) && isName(str[i+2]))) {
+            } else if (!flagNameChecker && isName(str[i])) {
                 surname = str[i];
-                name = str[i + 1];
-                patronymic = str[i + 2];
-                flagNameChecker = true;
-                System.out.println("Name, surname found");
+                int temp = 0;
+                for (int j = i + 1; j < str.length; j++) {
+                    if (isName(str[j]) && !isSex(str[j])) {
+                        name = str[j];
+                        temp = j;
+                        break;
+                    }
+                }
+                if(temp != 0 && temp != str.length) {
+                    for (int k = temp + 1; k < str.length; k++) {
+                        if (isName(str[k]) && !isSex(str[k])) {
+                            patronymic = str[k];
+                            flagNameChecker = true;
+                        }
+                    }
+                }
+
+                if (flagNameChecker)
+                    System.out.println("Name, surname, patronymic found");
             }
         }
 
@@ -66,7 +78,7 @@ public class StringChecker {
             System.out.printf("Не введен корректный номер телефона, необходимо %d цифр\n", phoneNumberLength);
         }
         if(!flagNameChecker){
-            System.out.println("Не найдены корректные фамилия, имя, отчество");
+            System.out.println("Не найдены корректные фамилия и/или имя и/или отчество");
         }
     }
 
@@ -81,7 +93,7 @@ public class StringChecker {
         }
     }
 
-    private static boolean isNumber(String value) {
+    private static boolean isPhoneNumber(String value) {
         try {
             long num = Long.parseLong(value);
             return true;
@@ -103,8 +115,18 @@ public class StringChecker {
         return value.charAt(0);
     }
 
+    private static boolean isSex(String value){
+        if(value.length() == 1){
+            char sexTemp = stringToChar(value);
+            if (sexTemp == 'f' || sexTemp == 'm'){
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static boolean isName(String value){
-        String regex = "\\D+";
+        String regex = "[a-zA-Zа-яА-Я]*$";
         return value.matches(regex);
     }
 
@@ -119,5 +141,9 @@ public class StringChecker {
             System.out.println("Введены не корректные данные, исправьте ошибки приведенные выше");
         }
         return  newUser;
+    }
+
+    public int getPhoneNumberLength() {
+        return phoneNumberLength;
     }
 }
